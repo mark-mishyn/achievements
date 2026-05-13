@@ -1,0 +1,9 @@
+version = 0.1
+
+[default.global.parameters]
+region = "eu-central-1"
+
+[default.deploy.parameters]
+stack_name = "achievements"
+capabilities = "CAPABILITY_NAMED_IAM"
+resolve_s3 = true
