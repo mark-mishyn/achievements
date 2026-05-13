@@ -55,6 +55,18 @@ Resources:
                 Resource:
                   - !GetAtt AchievementsBucket.Arn
                   - !Sub ${AchievementsBucket.Arn}/*
+        - PolicyName: AchievementsApiKeyAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/achievements/api-key
+              - Effect: Allow
+                Action:
+                  - kms:Decrypt
+                Resource: arn:aws:kms:*:*:alias/aws/ssm
 
   ApiFunction:
     Type: AWS::Serverless::Function
@@ -67,6 +79,7 @@ Resources:
       Environment:
         Variables:
           BUCKET_NAME: !Ref AchievementsBucket
+          API_KEY_PARAM: /achievements/api-key
 
 Outputs:
   ApiUrl:
