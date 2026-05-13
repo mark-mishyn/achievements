@@ -3,6 +3,7 @@
   "permissions": {
     "defaultMode": "acceptEdits",
     "allow": [
+      "Bash(uv add *)",
       "Bash(pytest *)",
       "Bash(pytest)",
       "Bash(python -m pytest *)",

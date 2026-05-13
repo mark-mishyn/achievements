@@ -5,5 +5,9 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "aws-lambda-powertools[aws-sdk,tracer]>=3.29.0",
     "boto3>=1.43.6",
 ]
+
+[tool.setuptools.packages.find]
+where = ["src"]
