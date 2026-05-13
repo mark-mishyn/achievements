@@ -1,0 +1,80 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Achievements API
+
+Globals:
+  Function:
+    Runtime: python3.13
+    Timeout: 30
+    MemorySize: 256
+    Tracing: Active
+    Environment:
+      Variables:
+        POWERTOOLS_SERVICE_NAME: achievements
+        LOG_LEVEL: INFO
+
+Resources:
+
+  AchievementsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub achievements-${AWS::AccountId}-${AWS::Region}
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub achievements-lambda-role-${AWS::Region}
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
+      Policies:
+        - PolicyName: AchievementsBucketAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:ListBucket
+                Resource:
+                  - !GetAtt AchievementsBucket.Arn
+                  - !Sub ${AchievementsBucket.Arn}/*
+
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: api.handler.handler
+      CodeUri: src/
+      Role: !GetAtt LambdaExecutionRole.Arn
+      FunctionUrlConfig:
+        AuthType: NONE
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref AchievementsBucket
+
+Outputs:
+  ApiUrl:
+    Description: Lambda Function URL
+    Value: !GetAtt ApiFunctionUrl.FunctionUrl
+  BucketName:
+    Description: Achievements S3 bucket
+    Value: !Ref AchievementsBucket
+  LambdaRoleArn:
+    Description: Lambda execution role ARN
+    Value: !GetAtt LambdaExecutionRole.Arn
