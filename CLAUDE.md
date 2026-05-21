@@ -19,17 +19,6 @@ uv run python <script.py>
 uv add <package>
 ```
 
-## Deployment
-
-The project uses [AWS SAM](https://docs.aws.amazon.com/serverless-application-model/) for infrastructure definition and deployment. The SAM template (`template.yaml`) defines:
-- A Lambda function (`ApiFunction`) exposed via a Function URL (no auth)
-- An S3 bucket (`AchievementsBucket`) for storage, with the ARN passed to Lambda via `BUCKET_NAME` env var
-- An IAM role with S3 and X-Ray permissions
-
 ## Architecture
 
-The API is built on AWS Lambda functions using [AWS Lambda Powertools for Python](https://docs.powertools.aws.dev/lambda/python/). Powertools provides utilities for routing (API Gateway event handling), logging, tracing, and metrics.
-
-## Dependencies
-- `boto3` — AWS SDK; the project interacts with AWS services
-- `aws-lambda-powertools` — Lambda utilities for API routing, logging, tracing, and metrics
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the full system design.
